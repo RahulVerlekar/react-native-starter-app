@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
-export default function Login() {
+export default function AddEntry() {
     return (
         <View
             style={{
