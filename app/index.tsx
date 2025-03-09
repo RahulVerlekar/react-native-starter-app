@@ -9,8 +9,7 @@ export default function Index() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Typography variant="h1" style={styles.title}>Navigation Demo</Typography>
-
+      <Typography variant="h2" style={styles.title}>Navigation Demo</Typography>
       <View style={styles.linksContainer}>
         <NavLink to="/login">Go to Login</NavLink>
         <NavLink to="/homepage">Go to Home</NavLink>
@@ -38,6 +37,6 @@ const styles = StyleSheet.create({
   },
   linksContainer: {
     alignItems: 'center',
-    width: '80%',
+    width: 280,
   },
 });

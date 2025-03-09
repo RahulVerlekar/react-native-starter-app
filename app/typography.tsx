@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, Text } from 'react-native';
 import { H1, H2, H3, H4, Body, Caption, Typography } from './components/Typography';
 import { useTheme } from './theme/ThemeContext';
 
@@ -92,6 +92,17 @@ export default function TypographyShowcase() {
             <Typography style={{ color: theme.colors.success }}>Success Color</Typography>
           </View>
         </View>
+
+        <View style={styles.section}>
+          <H2>All Defined Colors</H2>
+          {Object.entries(theme.colors).map(([colorName, colorValue]) => (
+            <View key={colorName} style={styles.colorExample}>
+              <View style={[styles.colorBox, { backgroundColor: colorValue }]} />
+              <Text style={styles.colorName}>{colorName}</Text>
+              <Text style={styles.colorValue}>{colorValue}</Text>
+            </View>
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -121,5 +132,24 @@ const styles = StyleSheet.create({
   description: {
     marginTop: 8,
     marginBottom: 16,
-  }
+  },
+  colorExample: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  colorBox: {
+    width: 40,
+    height: 40,
+    marginRight: 16,
+    borderRadius: 4,
+  },
+  colorName: {
+    flex: 1,
+    fontSize: 16,
+  },
+  colorValue: {
+    fontSize: 16,
+    color: 'gray',
+  },
 });

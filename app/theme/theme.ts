@@ -91,7 +91,7 @@ const spacing = {
 const lightColors: ThemeColors = {
   primary: '#5D5E5F',
   secondary: '#605E5E',
-  background: '#FFFFFF', // Slightly brighter for better contrast
+  background: '#FAFAFA', // Slightly brighter for better contrast
   card: '#F5F5F5', // Lighter for better separation
   text: '#121212', // Darker text for better readability
   border: '#747878', // outline
