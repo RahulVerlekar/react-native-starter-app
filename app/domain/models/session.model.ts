@@ -8,4 +8,10 @@ export class SessionModel extends BaseModel {
     endTime: Date;
     user?: UserModel;
     journalEntries?: JournalEntryModel[];
+    summaryTitle: string;
+    summary: string;
+    frameworkTitle: string = "Random Log";
+    keywords: string;    
+    emotion_score: any;  
+    quote: string;      
 }

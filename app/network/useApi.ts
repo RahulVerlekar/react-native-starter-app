@@ -25,9 +25,6 @@ export function useApi<T>(
     setError(null);
     
     try {
-      // Check if token exists before making the request
-      
-      
       const result = await apiMethod(apiClient, ...args);
       const parsedResult = typeof result === 'string' ? JSON.parse(result) : result;
       setData(parsedResult);

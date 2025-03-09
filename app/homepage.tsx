@@ -1,12 +1,13 @@
-import React, { useState, useRef } from 'react';
-import { View, StyleSheet, FlatList, Alert, Animated, TouchableOpacity, Text, Pressable } from "react-native";
+import React, { useState, useRef, useEffect } from 'react';
+import { View, StyleSheet, Alert, Animated, Pressable } from "react-native";
 import { useTheme } from "./theme/ThemeContext";
 import { H1, H2, Body } from "./components/Typography";
-import { ThemeToggle } from "./components/ThemeToggle";
-import { NavLink } from "./components/NavLink";
 import ToolbarHeader from "./components/ToolbarHeader";
 import ThreeLineText from "./components/ThreeLineText";
 import { Ionicons } from '@expo/vector-icons';
+import { useApi } from "./network/useApi";
+import { JournalEntryModel } from "./domain/models/journal-entry.model";
+import { SessionModel } from './domain/models/session.model';
 
 export default function HomePage() {
     const { theme } = useTheme();
@@ -15,13 +16,14 @@ export default function HomePage() {
     const [scrollY, setScrollY] = useState(new Animated.Value(0));
     const lastScrollY = useRef(0);
 
-    const recentEntries = [
-        { id: '1', caption: "MORNING REFLECTION", title: "A Fresh Start", body: "Woke up early today and went for a jog. The weather was perfect and it felt great to start the day with some exercise." },
-        { id: '2', caption: "WORK UPDATE", title: "Productive Meeting", body: "Had a very productive meeting with the team. We discussed the new project and everyone is excited to get started." },
-        { id: '3', caption: "EVENING REFLECTION", title: "Relaxing Evening", body: "Spent the evening reading a book and sipping on some tea. It was a peaceful end to a busy day." },
-        { id: '4', caption: "DINNER WITH FRIENDS", title: "Great Food and Company", body: "Went out for dinner with some friends. The food was amazing and we had a lot of fun catching up." },
-        { id: '5', caption: "NIGHT THOUGHTS", title: "Grateful for Today", body: "As I lay in bed, I feel grateful for all the good things that happened today. Looking forward to another great day tomorrow." },
-    ];
+    const { data: recentEntries, loading, error, execute: fetchEntries } = useApi<SessionModel[]>(
+        (client) => client.getUserSessions(),
+        { immediate: true }
+    );
+
+    useEffect(() => {
+        fetchEntries().catch(console.error);
+    }, []);
 
     const handleEntryClick = (param?: any) => {
         Alert.alert("Entry Clicked", `You clicked on: ${param}`);
@@ -42,19 +44,25 @@ export default function HomePage() {
             <ToolbarHeader title={today} />
             <H1>{greeting}</H1>
             <H2>Recent Entries</H2>
-            <Animated.FlatList
-                data={recentEntries}
-                renderItem={({ item }) => (
-                    <ThreeLineText
-                        caption={item.caption}
-                        title={item.title}
-                        body={item.body}
-                        onClick={handleEntryClick}
-                        param={item.title}
-                    />
-                )}
-                keyExtractor={item => item.id}
-            />
+            {loading ? (
+                <Body>Loading...</Body>
+            ) : error ? (
+                <Body>Error loading entries</Body>
+            ) : (
+                <Animated.FlatList
+                    data={recentEntries}
+                    renderItem={({ item }) => (
+                        <ThreeLineText
+                            caption={item.frameworkTitle}
+                            title={item.summaryTitle}
+                            body={item.summary}
+                            onClick={handleEntryClick}
+                            param={item}
+                        />
+                    )}
+                    keyExtractor={item => item.id}
+                />
+            )}
 
             <Animated.View style={[styles.fabContainer, { transform: [{ translateY: scrollY }] }]}>
                 <Pressable style={[styles.fab, { backgroundColor: theme.colors.onBackground }]} onPress={handleNewEntry}>
