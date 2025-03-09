@@ -32,10 +32,43 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "fonts": [
+      {
+        "asset": "./assets/fonts/DMSans-Regular.ttf"
+      },
+      {
+        "asset": "./assets/fonts/DMSans-Medium.ttf"
+      },
+      {
+        "asset": "./assets/fonts/DMSans-Bold.ttf"
+      },
+      {
+        "asset": "./assets/fonts/DMSans-Italic.ttf"
+      },
+      {
+        "asset": "./assets/fonts/DMSans-MediumItalic.ttf"
+      },
+      {
+        "asset": "./assets/fonts/DMSans-BoldItalic.ttf"
+      },
+      {
+        "asset": "./assets/fonts/DMSerifDisplay-Regular.ttf"
+      },
+      {
+        "asset": "./assets/fonts/DMSerifDisplay-Italic.ttf"
+      },
+      {
+        "asset": "./assets/fonts/DMSerifText-Regular.ttf"
+      },
+      {
+        "asset": "./assets/fonts/DMSerifText-Italic.ttf"
+      }
+    ]
   }
 }

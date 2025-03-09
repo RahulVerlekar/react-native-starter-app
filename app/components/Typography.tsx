@@ -20,39 +20,43 @@ export const Typography: React.FC<TypographyProps> = ({
     switch (variant) {
       case 'h1':
         return {
-          fontFamily: typography.fontFamily.bold,
+          fontFamily: typography.fontFamily.serif,
           fontSize: typography.fontSize.xxl,
-          color: colors.text,
+          color: colors.onBackground,
+          lineHeight: typography.fontSize.xxl + 1
         };
       case 'h2':
         return {
-          fontFamily: typography.fontFamily.bold,
+          fontFamily: typography.fontFamily.serif,
           fontSize: typography.fontSize.xl,
-          color: colors.text,
+          color: colors.onBackground,
+          lineHeight: typography.fontSize.xxl
         };
       case 'h3':
         return {
           fontFamily: typography.fontFamily.bold,
           fontSize: typography.fontSize.lg,
-          color: colors.text,
+          color: colors.onBackground,
         };
       case 'h4':
         return {
           fontFamily: typography.fontFamily.medium,
           fontSize: typography.fontSize.md,
-          color: colors.text,
+          color: colors.onBackground,
         };
       case 'caption':
         return {
           fontFamily: typography.fontFamily.regular,
           fontSize: typography.fontSize.xs,
-          color: colors.text,
+          color: colors.onSurfaceVariant,
+          letterSpacing: 0.4, // Slightly looser for small text
         };
       default:
         return {
           fontFamily: typography.fontFamily.regular,
           fontSize: typography.fontSize.md,
-          color: colors.text,
+          color: colors.onBackground,
+          lineHeight: typography.fontSize.md * 1.5, // Better line height for readability
         };
     }
   };
