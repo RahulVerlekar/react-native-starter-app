@@ -1,6 +1,7 @@
+import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
-export default function Home() {
+export default function Login() {
     return (
         <View
             style={{
@@ -9,7 +10,8 @@ export default function Home() {
                 alignItems: "center",
             }}
         >
-            <Text>Edit app/home/index.tsx to edit this screen.</Text>
+            <Text>Entry Details Screen.</Text>
+            <Link href="/entry-details">Go to Home</Link>
         </View>
     );
 }

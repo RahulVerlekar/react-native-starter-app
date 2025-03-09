@@ -10,8 +10,7 @@ export default function Login() {
                 alignItems: "center",
             }}
         >
-            <Text>Edit app/login/index.tsx to edit this screen.</Text>
-            <Link href="/home">Go to Home</Link>
+            <Text>Login Screen</Text>
         </View>
     );
 }
