@@ -37,16 +37,16 @@ export class FlowApiClient extends BaseNetworkRepo {
     return this.get<SessionModel[]>('/sessions');
   }
 
-  async startNewSession(): Promise<SessionModel> {
-    return this.get<SessionModel>('/sessions/start');
+  async startNewSession(framework: string): Promise<{session: SessionModel, entries: JournalEntryModel[]}> {
+    return this.get<{session: SessionModel, entries: JournalEntryModel[]}>('/sessions/start?framework=' + framework);
   }
 
   async endSession(sessionId: string): Promise<SessionModel> {
     return this.get<SessionModel>(`/sessions/${sessionId}/end`);
   }
 
-  async getNextQuestion(sessionId: string): Promise<JournalEntryModel[]> {
-    return this.get<JournalEntryModel[]>(`/sessions/${sessionId}/next-question`);
+  async getNextQuestion(sessionId: string): Promise<{session: SessionModel, entries: JournalEntryModel[]}> {
+    return this.get<{session: SessionModel, entries: JournalEntryModel[]}>(`/sessions/${sessionId}/next-question`);
   }
 
   async addAnswer(sessionId: string, entryId: string, answer: string): Promise<JournalEntryModel> {

@@ -7,32 +7,46 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { useApi } from "./network/useApi";
 import { JournalEntryModel } from "./domain/models/journal-entry.model";
-
-const title = "How did today go for you? Were there any moments that stood out or any challenges you faced?"
-const hint = "Write about your day here..."
+import { SessionModel } from "./domain/models/session.model";
 
 export default function AddEntry() {
 
     const theme = useTheme()
-    const sessionId = "374852c0-a7b6-455b-a706-2cf62bd3fea9"
     const [selectedEntry, setSelectedEntry] = useState<JournalEntryModel | null>(null);
+    const [answer, setAnswer] = useState<string>("");
 
-    const { data: entries, error, loading, execute: fetchSessionEntries } = useApi<JournalEntryModel[]>(
-        (client, sessionId) => client.getSessionEntries(sessionId),
+    const { data: created, error, loading, execute: fetchSessionEntries } = useApi<{ session: SessionModel, entries: JournalEntryModel[] }>(
+        (client) => client.startNewSession("Morning Reflection"),
+        { immediate: false }
+    );
+
+    const { execute: addAnswer } = useApi<JournalEntryModel>(
+        (client, sessionId, entryId, answer) => client.addAnswer(sessionId, entryId, answer),
+        { immediate: false }
+    );
+
+    const { execute: getNextQuestion } = useApi<{session: SessionModel, entries: JournalEntryModel[]}>(
+        (client, sessionId) => client.getNextQuestion(sessionId),
         { immediate: false }
     );
 
     useEffect(() => {
         const fetchEntries = async () => {
-            console.log("sessionId", sessionId);
-            if (sessionId) {
-                const entries = await fetchSessionEntries(sessionId);
-                setSelectedEntry(entries[0]);
-            }
+            const data = await fetchSessionEntries();
+            setSelectedEntry(data.entries[0]);
         };
         fetchEntries();
-    }, [sessionId]);
+    }, []);
 
+    const handleNextQuestion = async () => {
+        console.log("selectedEntry", selectedEntry);
+        if (selectedEntry && created?.session) {
+            await addAnswer(created?.session.id, selectedEntry.id, answer);
+            const data = await getNextQuestion(created?.session.id);
+            setSelectedEntry(data.entries[data.entries.length - 1]);
+            setAnswer("");
+        }
+    };
 
     return (
         <>
@@ -40,7 +54,7 @@ export default function AddEntry() {
                 <ToolbarHeader title="Add Entry" />
                 <View style={sty.contentContainer}>
                     <View style={sty.qnaIndicator}>
-                        <Caption>{entries ? `${entries.findIndex(entry => entry.id === selectedEntry?.id) + 1}/${entries.length}` : "0/0"}</Caption>
+
                     </View>
                     <View style={sty.qnaContainer}>
                         <View style={sty.questionContainer}>
@@ -50,35 +64,23 @@ export default function AddEntry() {
                             <TextInput
                                 style={[{ fontSize: theme.theme.typography.fontSize.xl }]}
                                 placeholder={selectedEntry?.question?.hint ?? ""}
+                                value={answer}
+                                onChangeText={setAnswer}
                                 multiline
                             />
                         </View>
                     </View>
                     <View style={sty.bottomContainer}>
                         <Button
-                            title="Previous"
-                            onPress={() => {
-                                if (selectedEntry && entries) {
-                                    const currentIndex = entries.findIndex(entry => entry.id === selectedEntry.id);
-                                    if (currentIndex > 0) {
-                                        setSelectedEntry(entries[currentIndex - 1]);
-                                    }
-                                }
-                            }}
-                            disabled={!selectedEntry || (entries && entries.findIndex(entry => entry.id === selectedEntry.id) === 0)}
+                            title="Next Question"
+                            onPress={handleNextQuestion}
                             color={theme.theme.dark ? "#FFFFFF" : "#000000"}
                         />
                         <Button
-                            title="Next"
+                            title="End Session"
                             onPress={() => {
-                                if (selectedEntry && entries) {
-                                    const currentIndex = entries.findIndex(entry => entry.id === selectedEntry.id);
-                                    if (currentIndex < entries.length - 1) {
-                                        setSelectedEntry(entries[currentIndex + 1]);
-                                    }
-                                }
+
                             }}
-                            disabled={!selectedEntry || (entries && entries.findIndex(entry => entry.id === selectedEntry.id) === entries.length - 1)}
                             color={theme.theme.dark ? "#FFFFFF" : "#000000"}
                         />
                     </View>

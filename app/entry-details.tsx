@@ -18,15 +18,13 @@ export default function EntryDetails() {
 
     const { data: entries, error, loading, execute: fetchSessionEntries } = useApi<{ session: SessionModel, entries: JournalEntryModel[] }>(
         (client, sessionId) => client.getSessionDetails(sessionId),
-        { immediate: false }
+        { immediate: false, onSuccess: (data) => console.log("data", data) },
     );
 
     useEffect(() => {
         console.log("sessionId", sessionId);
         if (sessionId) {
-            fetchSessionEntries(sessionId).catch(err => {
-                console.error("Error fetching session entries:", err);
-            });
+            fetchSessionEntries(sessionId)
         }
     }, [sessionId]);
 
