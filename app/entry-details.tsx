@@ -1,8 +1,8 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Button, StyleSheet, Text, View, TouchableOpacity, FlatList } from "react-native";
+import { Button, StyleSheet, Text, View, TouchableOpacity, FlatList, ScrollView } from "react-native";
 import ToolbarHeader from "./components/ToolbarHeader";
 import { useEffect, useState } from "react";
-import { Body, Caption, H3 } from "./components/Typography";
+import { Body, Caption, H2, H3 } from "./components/Typography";
 import TwoLineText from "./components/TwoLineText";
 import { SessionModel } from "./domain/models/session.model";
 import { useApi } from "./network/useApi";
@@ -16,16 +16,17 @@ export default function EntryDetails() {
         sessionId: string
     }>();
 
-    const { data: entries, error, loading, execute: fetchSessionEntries } = useApi<{session: SessionModel, entries: JournalEntryModel[]}>(
+    const { data: entries, error, loading, execute: fetchSessionEntries } = useApi<{ session: SessionModel, entries: JournalEntryModel[] }>(
         (client, sessionId) => client.getSessionDetails(sessionId),
-        { immediate: true }
+        { immediate: false }
     );
 
     useEffect(() => {
         console.log("sessionId", sessionId);
         if (sessionId) {
-            const temp = fetchSessionEntries(sessionId).catch(console.error);
-            console.error("temp", temp);
+            fetchSessionEntries(sessionId).catch(err => {
+                console.error("Error fetching session entries:", err);
+            });
         }
     }, [sessionId]);
 
@@ -50,12 +51,13 @@ export default function EntryDetails() {
                 selectedTab === "entry" ?
                     <EntryTab entries={entries?.entries ?? []} /> :
                     <AnalysisTab
-                        title={entries?.session.frameworkTitle ?? ""}
-                        summary={entries?.session.summaryTitle ?? ""}
-                        insigts={entries?.session.summary ?? ""}
-                        Quotes={entries?.session.quote ?? ""}
-                        topics={entries?.session.keywords.split(',') ?? []}
-                        emotions={entries?.session.emotion_score ?? []}
+                        title={entries?.session?.frameworkTitle ?? ""}
+                        summary={entries?.session?.summaryTitle ?? ""}
+                        insigts={entries?.session?.summary ?? ""}
+                        Quotes={entries?.session?.quote ?? ""}
+                        topics={entries?.session?.keywords.split(',') ?? []}
+                        emotions={[]}
+                        emotionScores={entries?.session?.emotion_score ?? {}}
                     />}
         </View>
     );
@@ -68,17 +70,36 @@ type AnalysisTabProps = {
     Quotes: string;
     topics: string[];
     emotions: string[];
+    emotionScores: { [key: string]: number };
 }
-const AnalysisTab = ({ title, summary, insigts, Quotes, topics, emotions }: AnalysisTabProps) => {
+
+const AnalysisTab = ({ title, summary, insigts, Quotes, topics, emotions, emotionScores }: AnalysisTabProps) => {
     return (
-        <View>
-            <Text>Analysis Tab</Text>
-            <TwoLineText title={title} body={summary} />
-            <TwoLineText title="Insights" body={insigts} />
-            <TwoLineText title="Quotes" body={Quotes} />
-            <TwoLineText title="Topics" body={topics.join(", ")} />
-            <TwoLineText title="Emotions" body={emotions.join(", ")} hideVerticalLine={true} />
-        </View>
+        <ScrollView>
+            <View>
+                <TwoLineText title={title} body={summary} />
+                <TwoLineText title="Insights" body={insigts} />
+                <TwoLineText title="Quotes" body={Quotes} />
+                <H2>Topics</H2>
+                <View style={styles.chipContainer}>
+                    {topics.map((topic, index) => (
+                        <View key={index} style={styles.chip}>
+                            <Caption style={styles.chipText}>{topic.toLowerCase()}</Caption>
+                        </View>
+                    ))}
+                </View>
+                <View style={styles.verticalLine} />
+                <H2>Emotions</H2>
+                <View style={styles.chipContainer}>
+                    {Object.entries(emotionScores).map(([emotion, score], index) => (
+                        <View key={index} style={styles.chip}>
+                            <Caption style={styles.chipText}>{`${emotion.toLowerCase()}: ${score}`}</Caption>
+                        </View>
+                    ))}
+                </View>
+                <View style={styles.verticalLine} />
+            </View>
+        </ScrollView>
     );
 }
 
@@ -92,11 +113,11 @@ const EntryTab = ({ entries }: EntryTabProps) => {
             data={entries}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-            <TwoLineText
-                title={item.question?.question ?? ""}
-                body={item.entry}
-                hideVerticalLine={true}
-            />
+                <TwoLineText
+                    title={item.question?.question ?? ""}
+                    body={item.entry}
+                    hideVerticalLine={true}
+                />
             )}
         />
     );
@@ -135,5 +156,30 @@ const styles = StyleSheet.create({
     },
     selectedButtonText: {
         color: 'white',
+    },
+    textContainer: {
+        flex: 1,
+    },
+    chipContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 16,
+        marginStart: 16,
+    },
+    chip: {
+        backgroundColor: 'black',
+        borderRadius: 8,
+        padding: 8,
+        marginRight: 8,
+        marginBottom: 8,
+    },
+    chipText: {
+        color: 'white',
+    },
+    verticalLine: {
+        height: 1,
+        width: '100%',
+        backgroundColor: 'black',
+        marginTop: 16
     },
 });
