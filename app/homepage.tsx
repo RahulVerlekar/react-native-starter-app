@@ -6,11 +6,12 @@ import ToolbarHeader from "./components/ToolbarHeader";
 import ThreeLineText from "./components/ThreeLineText";
 import { Ionicons } from '@expo/vector-icons';
 import { useApi } from "./network/useApi";
-import { JournalEntryModel } from "./domain/models/journal-entry.model";
 import { SessionModel } from './domain/models/session.model';
+import { useRouter } from "expo-router";
 
 export default function HomePage() {
     const { theme } = useTheme();
+    const router = useRouter();
     const today = new Date().toLocaleDateString();
     const greeting = "Hello, Good Evening";
     const [scrollY, setScrollY] = useState(new Animated.Value(0));
@@ -25,8 +26,11 @@ export default function HomePage() {
         fetchEntries().catch(console.error);
     }, []);
 
-    const handleEntryClick = (param?: any) => {
-        Alert.alert("Entry Clicked", `You clicked on: ${param}`);
+    const handleEntryClick = (param?: SessionModel) => {
+        router.push({
+            pathname: "/entry-details",
+            params: { sessionId: param?.id },
+        });
     };
 
     const handleNewEntry = () => {

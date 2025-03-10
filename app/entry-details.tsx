@@ -1,14 +1,33 @@
-import { Link } from "expo-router";
-import { Button, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { Button, StyleSheet, Text, View, TouchableOpacity, FlatList } from "react-native";
 import ToolbarHeader from "./components/ToolbarHeader";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Body, Caption, H3 } from "./components/Typography";
 import TwoLineText from "./components/TwoLineText";
+import { SessionModel } from "./domain/models/session.model";
+import { useApi } from "./network/useApi";
+import { JournalEntryModel } from "./domain/models/journal-entry.model";
 
 type Tab = "entry" | "analysis";
 
 export default function EntryDetails() {
     const [selectedTab, setSelectedTab] = useState<Tab>("entry");
+    const { sessionId } = useLocalSearchParams<{
+        sessionId: string
+    }>();
+
+    const { data: entries, error, loading, execute: fetchSessionEntries } = useApi<{session: SessionModel, entries: JournalEntryModel[]}>(
+        (client, sessionId) => client.getSessionDetails(sessionId),
+        { immediate: true }
+    );
+
+    useEffect(() => {
+        console.log("sessionId", sessionId);
+        if (sessionId) {
+            const temp = fetchSessionEntries(sessionId).catch(console.error);
+            console.error("temp", temp);
+        }
+    }, [sessionId]);
 
     return (
         <View style={styles.container}>
@@ -29,14 +48,14 @@ export default function EntryDetails() {
             </View>
             {
                 selectedTab === "entry" ?
-                    <EntryTab /> :
+                    <EntryTab entries={entries?.entries ?? []} /> :
                     <AnalysisTab
-                        title="Analysis Title"
-                        summary="Analysis Summary"
-                        insigts="Analysis Insights"
-                        Quotes="Analysis Quotes"
-                        topics={["Topic 1", "Topic 2"]}
-                        emotions={["Emotion 1", "Emotion 2"]}
+                        title={entries?.session.frameworkTitle ?? ""}
+                        summary={entries?.session.summaryTitle ?? ""}
+                        insigts={entries?.session.summary ?? ""}
+                        Quotes={entries?.session.quote ?? ""}
+                        topics={entries?.session.keywords.split(',') ?? []}
+                        emotions={entries?.session.emotion_score ?? []}
                     />}
         </View>
     );
@@ -63,20 +82,23 @@ const AnalysisTab = ({ title, summary, insigts, Quotes, topics, emotions }: Anal
     );
 }
 
-
 type EntryTabProps = {
-    title: string;
-    summary: string;
-    insigts: string;
-    Quotes: string;
-    topics: string[];
-    emotions: string[];
+    entries: JournalEntryModel[];
 }
-const EntryTab = () => {
+const EntryTab = ({ entries }: EntryTabProps) => {
+    console.log("entries", entries);
     return (
-        <View>
-            <Text>Entry Tab</Text>
-        </View>
+        <FlatList
+            data={entries}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+            <TwoLineText
+                title={item.question?.question ?? ""}
+                body={item.entry}
+                hideVerticalLine={true}
+            />
+            )}
+        />
     );
 }
 

@@ -57,6 +57,10 @@ export class FlowApiClient extends BaseNetworkRepo {
     return this.get<JournalEntryModel[]>(`/sessions/${sessionId}/entries`);
   }
 
+  async getSessionDetails(sessionId: string): Promise<{session: SessionModel, entries: JournalEntryModel[]}> {
+    return this.get<{session: SessionModel, entries: JournalEntryModel[]}>(`/sessions/${sessionId}/details`);
+  }
+
   async getLastEntries(): Promise<Array<{ sessionId: string, lastEntry: JournalEntryModel }>>{
     return this.get<Array<{ sessionId: string, lastEntry: JournalEntryModel }>>('/sessions/last-entries');
   }
