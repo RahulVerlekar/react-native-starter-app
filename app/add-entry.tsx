@@ -1,5 +1,5 @@
 import { Link, router } from "expo-router";
-import { Text, View, Button, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { Text, View, Button, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, Pressable } from "react-native";
 import ToolbarHeader from "./components/ToolbarHeader";
 import { Caption, H1, H2 } from "./components/Typography";
 import { useTheme } from "./theme/ThemeContext";
@@ -9,7 +9,7 @@ import { useApi } from "./network/useApi";
 import { JournalEntryModel } from "./domain/models/journal-entry.model";
 import { SessionModel } from "./domain/models/session.model";
 import { useVoiceRecorder } from './hooks/useVoiceRecorder';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useVoicePlayback } from './hooks/useVoicePlayback';
 
 export default function AddEntry() {
@@ -29,20 +29,20 @@ export default function AddEntry() {
         { immediate: false }
     );
 
-    const { execute: getNextQuestion } = useApi<{session: SessionModel, entries: JournalEntryModel[]}>(
+    const { execute: getNextQuestion } = useApi<{ session: SessionModel, entries: JournalEntryModel[] }>(
         (client, sessionId) => client.getNextQuestion(sessionId),
         { immediate: false }
     );
 
-    const { 
-        isRecording, 
-        isTranscribing, 
-        error: recordingError, 
-        startRecording, 
-        stopRecordingAndTranscribe 
+    const {
+        isRecording,
+        isTranscribing,
+        error: recordingError,
+        startRecording,
+        stopRecordingAndTranscribe
     } = useVoiceRecorder();
 
-    const { 
+    const {
         isPlaying,
         error: playbackError,
         playVoice,
@@ -66,7 +66,7 @@ export default function AddEntry() {
             const data = await getNextQuestion(created?.session.id);
             setSelectedEntry(data.entries[data.entries.length - 1]);
             setAnswer("");
-            
+
             const lastEntry = data.entries[data.entries.length - 1];
             if (lastEntry?.question?.question) {
                 await playVoice(lastEntry.question.question);
@@ -107,18 +107,38 @@ export default function AddEntry() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.container}>
-                <ToolbarHeader 
-                    title="Add Entry" 
-                    leftIcon={
-                        <TouchableOpacity onPress={handleBackPress}>
-                            <Ionicons 
-                                name="arrow-back" 
-                                size={24} 
-                                color={theme.theme.dark ? "#FFFFFF" : "#000000"} 
+                <View style={styles.headerContainer}>
+                    <H2 style={styles.title}>Journal Details</H2>
+                    <View style={styles.toolbarButtons}>
+                        <TouchableOpacity
+                            onPress={handleVoiceRecording}
+                            style={[
+                                styles.micButton,
+                                isRecording && styles.recording,
+                                handsfreeModeActive && styles.handsfreeMode
+                            ]}
+                        >
+                            <Ionicons
+                                name={isRecording ? "stop-circle" : "mic"}
+                                size={24}
+                                color={theme.theme.dark ? "#FFFFFF" : "#000000"}
                             />
                         </TouchableOpacity>
-                    }
-                />
+                        {/* <TouchableOpacity
+                            onPress={isPlaying ? stopPlaying : () => playVoice(selectedEntry?.question?.question || '')}
+                            style={[styles.micButton, isPlaying && styles.playing]}
+                        >
+                            <Ionicons
+                                name={isPlaying ? "stop" : "play"}
+                                size={24}
+                                color={theme.theme.dark ? "#FFFFFF" : "#000000"}
+                            />
+                        </TouchableOpacity> */}
+                        <TouchableOpacity onPress={handleBackPress}>
+                            <MaterialIcons name="close" size={24} color='black' />
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <View style={styles.contentContainer}>
                     <View style={styles.qnaIndicator}>
                         {recordingError && <Caption style={styles.error}>{recordingError}</Caption>}
@@ -143,40 +163,13 @@ export default function AddEntry() {
                         </View>
                     </View>
                     <View style={styles.bottomContainer}>
-                        <TouchableOpacity 
-                            onPress={handleVoiceRecording}
-                            style={[
-                                styles.micButton,
-                                isRecording && styles.recording,
-                                handsfreeModeActive && styles.handsfreeMode
-                            ]}
-                        >
-                            <Ionicons 
-                                name={isRecording ? "stop-circle" : "mic"} 
-                                size={24} 
-                                color={theme.theme.dark ? "#FFFFFF" : "#000000"} 
+                        <View style={{alignSelf: 'flex-end'}}>
+                            <Button
+                                title="Next Question"
+                                onPress={handleNextQuestion}
+                                color={theme.theme.dark ? "#FFFFFF" : "#000000"}
                             />
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            onPress={isPlaying ? stopPlaying : () => playVoice(selectedEntry?.question?.question || '')}
-                            style={[styles.micButton, isPlaying && styles.playing]}
-                        >
-                            <Ionicons 
-                                name={isPlaying ? "stop" : "play"} 
-                                size={24} 
-                                color={theme.theme.dark ? "#FFFFFF" : "#000000"} 
-                            />
-                        </TouchableOpacity>
-                        <Button
-                            title="Next Question"
-                            onPress={handleNextQuestion}
-                            color={theme.theme.dark ? "#FFFFFF" : "#000000"}
-                        />
-                        <Button
-                            title="End Session"
-                            onPress={() => {}}
-                            color={theme.theme.dark ? "#FFFFFF" : "#000000"}
-                        />
+                        </View>
                     </View>
                 </View>
             </View>
@@ -201,10 +194,9 @@ const styles = StyleSheet.create({
         flexGrow: 1,
     },
     bottomContainer: {
-        height: 68,
         flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
+        justifyContent: "flex-end",
+        alignItems: "flex-end",
     },
     questionContainer: {
 
@@ -227,12 +219,12 @@ const styles = StyleSheet.create({
     micButton: {
         padding: 10,
         borderRadius: 25,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#00000000',
         alignItems: 'center',
         justifyContent: 'center',
     },
     recording: {
-        backgroundColor: '#ff4444',
+        backgroundColor: '#ff0000',
     },
     error: {
         color: '#ff4444',
@@ -242,6 +234,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#4444ff',
     },
     handsfreeMode: {
-        backgroundColor: '#44ff44',
+        backgroundColor: '#fff4444',
+    },
+    title: {
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginStart: 16,
+        marginTop: 16,
+        marginEnd: 16,
+    },
+    toolbarButtons: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
 });

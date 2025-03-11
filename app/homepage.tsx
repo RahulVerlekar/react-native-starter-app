@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Alert, Animated, Pressable } from "react-native";
+import { View, StyleSheet, Alert, Animated, Pressable, TouchableOpacity } from "react-native";
 import { useTheme } from "./theme/ThemeContext";
 import { H1, H2, Body } from "./components/Typography";
 import ThreeLineText from "./components/ThreeLineText";
@@ -47,7 +47,7 @@ export default function HomePage() {
         >
             <View style={styles.headerContainer}>
                 <H1 style={styles.greeting}>{greeting}</H1>
-                <Pressable onPress={() => Alert.alert("Logout", "Are you sure you want to logout?", [
+                <TouchableOpacity onPress={() => Alert.alert("Logout", "Are you sure you want to logout?", [
                     { text: "Cancel", style: "cancel" },
                     { text: "Logout", onPress: () => {
                         clearAuthToken();
@@ -55,7 +55,7 @@ export default function HomePage() {
                     } }
                 ])}>
                     <MaterialIcons name="logout" size={24} color='red' />
-                </Pressable>
+                </TouchableOpacity>
             </View>
             <H2 style={[styles.subtitle, { marginBottom: 4 }]}>Your journal entries</H2>
             {loading ? (

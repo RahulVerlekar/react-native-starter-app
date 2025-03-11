@@ -1,12 +1,14 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Button, StyleSheet, Text, View, TouchableOpacity, FlatList, ScrollView } from "react-native";
+import { Button, StyleSheet, Text, View, TouchableOpacity, FlatList, ScrollView, Pressable } from "react-native";
 import ToolbarHeader from "./components/ToolbarHeader";
 import { useEffect, useState } from "react";
-import { Body, Caption, H2, H3 } from "./components/Typography";
+import { Body, Caption, H1, H2, H3 } from "./components/Typography";
 import TwoLineText from "./components/TwoLineText";
 import { SessionModel } from "./domain/models/session.model";
 import { useApi } from "./network/useApi";
 import { JournalEntryModel } from "./domain/models/journal-entry.model";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialIcons } from "@expo/vector-icons";
 
 type Tab = "entry" | "analysis";
 
@@ -27,10 +29,18 @@ export default function EntryDetails() {
             fetchSessionEntries(sessionId)
         }
     }, [sessionId]);
+    const router = useRouter();
 
     return (
-        <View style={styles.container}>
-            <ToolbarHeader title="Entry Details" />
+        <SafeAreaView style={styles.container}>
+            <View style={styles.headerContainer}>
+                <H2 style={styles.title}>Journal Details</H2>
+                <TouchableOpacity onPress={() => {
+                    router.back();
+                }}>
+                    <MaterialIcons name="close" size={24} color='black' />
+                </TouchableOpacity>
+            </View>
             <View style={styles.buttonBar}>
                 <TouchableOpacity
                     style={selectedTab === "entry" ? styles.selectedButton : styles.button}
@@ -46,18 +56,24 @@ export default function EntryDetails() {
                 </TouchableOpacity>
             </View>
             {
-                selectedTab === "entry" ?
-                    <EntryTab entries={entries?.entries ?? []} /> :
-                    <AnalysisTab
-                        title={entries?.session?.frameworkTitle ?? ""}
-                        summary={entries?.session?.summaryTitle ?? ""}
-                        insigts={entries?.session?.summary ?? ""}
-                        Quotes={entries?.session?.quote ?? ""}
-                        topics={entries?.session?.keywords.split(',') ?? []}
-                        emotions={[]}
-                        emotionScores={entries?.session?.emotion_score ?? {}}
-                    />}
-        </View>
+                selectedTab === "entry" ? (
+                    <View style={{ paddingStart: 16, paddingEnd: 16 }}>
+                        <EntryTab entries={entries?.entries ?? []} />
+                    </View>
+                ) : (
+                    <ScrollView style={{ paddingStart: 16, paddingEnd: 16 }}>
+                        <AnalysisTab
+                            title={entries?.session?.frameworkTitle ?? ""}
+                            summary={entries?.session?.summaryTitle ?? ""}
+                            insigts={entries?.session?.summary ?? ""}
+                            Quotes={entries?.session?.quote ?? ""}
+                            topics={entries?.session?.keywords.split(',') ?? []}
+                            emotions={[]}
+                            emotionScores={entries?.session?.emotion_score ?? {}}
+                        />
+                    </ScrollView>
+                )}
+        </SafeAreaView>
     );
 }
 
@@ -105,7 +121,6 @@ type EntryTabProps = {
     entries: JournalEntryModel[];
 }
 const EntryTab = ({ entries }: EntryTabProps) => {
-    console.log("entries", entries);
     return (
         <FlatList
             data={entries}
@@ -123,11 +138,13 @@ const EntryTab = ({ entries }: EntryTabProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
     },
     buttonBar: {
         flexDirection: 'row',
-        padding: 16,
+        paddingStart: 8,
+        paddingEnd: 8,
+        marginTop: 16,
     },
     selectedButton: {
         backgroundColor: 'black',
@@ -179,5 +196,15 @@ const styles = StyleSheet.create({
         width: '100%',
         backgroundColor: 'black',
         marginTop: 16
+    },
+    title: {
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginStart: 16,
+        marginTop: 16,
+        marginEnd: 16,
     },
 });

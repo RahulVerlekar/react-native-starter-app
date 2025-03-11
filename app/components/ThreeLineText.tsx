@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Caption, H2, Body } from './Typography';
+import { Caption, H2, Body, H3 } from './Typography';
 
 interface StackedTextProps {
     caption: string;
@@ -16,7 +16,7 @@ export default function ThreeLineText({ caption, title, body, onClick, param }: 
             <View style={styles.container}>
                 <View style={styles.textContainer}>
                     <Caption>{caption}</Caption>
-                    <H2>{title}</H2>
+                    <H3>{title}</H3>
                     <Body>{body}</Body>
                     <View style={styles.verticalLine} />
                 </View>

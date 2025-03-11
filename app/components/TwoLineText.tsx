@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Caption, H2, Body } from './Typography';
+import { Caption, H2, Body, H3 } from './Typography';
 
 interface StackedTextProps {
     title: string;
@@ -15,7 +15,7 @@ export default function TwoLineText({ title, body, onClick, param, hideVerticalL
         <TouchableOpacity onPress={() => onClick && onClick(param)}>
             <View style={styles.container}>
                 <View style={styles.textContainer}>
-                    <H2>{title}</H2>
+                    <H3>{title}</H3>
                     <Body>{body}</Body>
                     {!hideVerticalLine && <View style={styles.verticalLine} />}
                 </View>
