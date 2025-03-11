@@ -1,5 +1,5 @@
-import { Link } from "expo-router";
-import { Text, View, Button, TextInput, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { Link, router } from "expo-router";
+import { Text, View, Button, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
 import ToolbarHeader from "./components/ToolbarHeader";
 import { Caption, H1, H2 } from "./components/Typography";
 import { useTheme } from "./theme/ThemeContext";
@@ -86,10 +86,39 @@ export default function AddEntry() {
         }
     };
 
+    const handleBackPress = () => {
+        Alert.alert(
+            "End Session",
+            "This will end the conversation. You will not be able to restart it. Are you sure?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel"
+                },
+                {
+                    text: "Yes, End Session",
+                    onPress: () => router.back(),
+                    style: "destructive"
+                }
+            ]
+        );
+    };
+
     return (
-        <>
+        <SafeAreaView style={styles.container}>
             <View style={styles.container}>
-                <ToolbarHeader title="Add Entry" />
+                <ToolbarHeader 
+                    title="Add Entry" 
+                    leftIcon={
+                        <TouchableOpacity onPress={handleBackPress}>
+                            <Ionicons 
+                                name="arrow-back" 
+                                size={24} 
+                                color={theme.theme.dark ? "#FFFFFF" : "#000000"} 
+                            />
+                        </TouchableOpacity>
+                    }
+                />
                 <View style={styles.contentContainer}>
                     <View style={styles.qnaIndicator}>
                         {recordingError && <Caption style={styles.error}>{recordingError}</Caption>}
@@ -151,7 +180,7 @@ export default function AddEntry() {
                     </View>
                 </View>
             </View>
-        </>
+        </SafeAreaView>
     );
 }
 

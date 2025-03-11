@@ -11,7 +11,7 @@ function RootLayoutNav() {
   }
   
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" options={{ title: 'Index' }} />
       <Stack.Screen name="login" options={{ title: 'Login' }} />
       <Stack.Screen name="homepage" options={{ title: 'Home' }} />

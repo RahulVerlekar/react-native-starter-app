@@ -2,12 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, Alert, Animated, Pressable } from "react-native";
 import { useTheme } from "./theme/ThemeContext";
 import { H1, H2, Body } from "./components/Typography";
-import ToolbarHeader from "./components/ToolbarHeader";
 import ThreeLineText from "./components/ThreeLineText";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useApi } from "./network/useApi";
 import { SessionModel } from './domain/models/session.model';
 import { useRouter } from "expo-router";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { clearAuthToken } from './network/AuthStorage';
 
 export default function HomePage() {
     const { theme } = useTheme();
@@ -15,7 +16,6 @@ export default function HomePage() {
     const today = new Date().toLocaleDateString();
     const greeting = "Hello, Good Evening";
     const [scrollY, setScrollY] = useState(new Animated.Value(0));
-    const lastScrollY = useRef(0);
 
     const { data: recentEntries, loading, error, execute: fetchEntries } = useApi<SessionModel[]>(
         (client) => client.getUserSessions(),
@@ -34,20 +34,30 @@ export default function HomePage() {
     };
 
     const handleNewEntry = () => {
-        Alert.alert("New Entry", "Create a new entry.");
+        router.push("/add-entry");
     };
 
     return (
-        <View
+        <SafeAreaView
             style={{
                 flex: 1,
                 backgroundColor: theme.colors.background,
                 padding: theme.spacing.md,
             }}
         >
-            <ToolbarHeader title={today} />
-            <H1>{greeting}</H1>
-            <H2>Recent Entries</H2>
+            <View style={styles.headerContainer}>
+                <H1 style={styles.greeting}>{greeting}</H1>
+                <Pressable onPress={() => Alert.alert("Logout", "Are you sure you want to logout?", [
+                    { text: "Cancel", style: "cancel" },
+                    { text: "Logout", onPress: () => {
+                        clearAuthToken();
+                        router.replace("/");
+                    } }
+                ])}>
+                    <MaterialIcons name="logout" size={24} color='red' />
+                </Pressable>
+            </View>
+            <H2 style={[styles.subtitle, { marginBottom: 4 }]}>Your journal entries</H2>
             {loading ? (
                 <Body>Loading...</Body>
             ) : error ? (
@@ -74,7 +84,7 @@ export default function HomePage() {
                     <Body style={styles.fabText}>New Entry</Body>
                 </Pressable>
             </Animated.View>
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -125,5 +135,14 @@ const styles = StyleSheet.create({
         color: 'white',
         marginLeft: 8,
         fontSize: 16,
+    },
+    greeting: {
+        marginTop: 16,
+        marginBottom: 16,
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
 });
