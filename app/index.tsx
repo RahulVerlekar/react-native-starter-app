@@ -10,21 +10,6 @@ export default function Index() {
 
   return (
     <Login />
-    // <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-    //   <Typography variant="h2" style={styles.title}>Navigation Demo</Typography>
-    //   <View style={styles.linksContainer}>
-    //     <NavLink to="/login">Go to Login</NavLink>
-    //     <NavLink to="/homepage">Go to Home</NavLink>
-    //     <NavLink to="/add-entry">Add Entry</NavLink>
-    //     <NavLink to="/entry-details">View Entry Details</NavLink>
-    //     <NavLink to="/signup">Sign Up</NavLink>
-    //     <H2>Design System</H2>
-    //     <NavLink to="/typography">Typography Guide</NavLink>
-    //     <NavLink to="/components">UI Components</NavLink>
-    //   </View>
-
-    //   <ThemeToggle />
-    // </View>
   );
 }
 

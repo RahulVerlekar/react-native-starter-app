@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
-import { GROQ_API_KEY } from '@env';
 
 export const useVoiceRecorder = () => {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
@@ -72,7 +71,7 @@ export const useVoiceRecorder = () => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${GROQ_API_KEY}`,
+            Authorization: `Bearer ${process.env.EXPO_PUBLIC_GROQ_API_KEY}`,
             "Content-Type": "multipart/form-data",
           },
           body: formData,
