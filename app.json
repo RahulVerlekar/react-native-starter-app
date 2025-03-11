@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.rahulverlekar.reactnativestarterapp"
     },
     "web": {
       "bundler": "metro",
@@ -69,6 +70,14 @@
       {
         "asset": "./assets/fonts/DMSerifText-Italic.ttf"
       }
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "f7e8892a-4605-48f0-9c2e-143af3567b2a"
+      }
+    }
   }
 }
