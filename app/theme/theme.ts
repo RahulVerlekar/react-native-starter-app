@@ -152,7 +152,7 @@ const darkColors: ThemeColors = {
 
 export const getTheme = (scheme: ColorSchemeName): Theme => ({
   dark: scheme === 'dark',
-  colors: scheme === 'dark' ? darkColors : lightColors,
+  colors: lightColors,
   typography,
   spacing,
 });

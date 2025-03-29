@@ -10,7 +10,8 @@ export class SessionModel extends BaseModel {
     journalEntries?: JournalEntryModel[];
     summaryTitle: string;
     summary: string;
-    frameworkTitle: string = "Random Log";
+    type: 'Freestyle' | 'FrameworkAided';
+    sessionTitle: string = "Random Log";
     keywords: string;    
     emotion_score: any;  
     quote: string;      
