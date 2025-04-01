@@ -5,15 +5,26 @@ import { useTheme } from "./theme/ThemeContext";
 import { Body, H1 } from "./components/Typography";
 import { useApi } from "./network/useApi";
 import { saveAuthToken, getAuthToken } from "./network/AuthStorage";
+import Toolbar from "./components/NewToolbar";
+import { SafeAreaView } from "react-native-safe-area-context";
+import EditText from "./components/EditText";
 
 export default function Login() {
     const { theme } = useTheme();
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [disabled, setDisabled] = useState(true);
+
+    useEffect( () => {
+        if (email && password) {
+            setDisabled(false)
+        } else {
+            setDisabled(true)
+        }
+    },[email, password])
 
     useEffect(() => {
-        // Check if user is already logged in
         const checkAuth = async () => {
             const token = await getAuthToken();
             if (token) {
@@ -46,68 +57,93 @@ export default function Login() {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-            <View style={styles.logoContainer}>
-                <Image
-                style = {{ width: 64, height: 64}}
-                    source={require('../assets/images/flow_logo.png')} />
+        <SafeAreaView style={[styles.container, { backgroundColor: "#fff" }]}>
+            <View style={styles.toolbar}>
+                <Toolbar
+                    title="Sign In"
+                    hasBack={false}
+                />
             </View>
-            <H1 style={styles.title}>Flow</H1>
-            <View style={{ width: '100%', backgroundColor: 'white', borderRadius: 5, padding: 8 }}>
-                <Body style={{ color: theme.colors.text, textAlign: 'left', width: '100%', paddingStart: 4 }}>Email</Body>
-                <TextInput
-                    style={[styles.input, { borderColor: '#00000000', color: theme.colors.primary, paddingBottom: 4, paddingStart: 4, paddingTop: 4 }]}
-                    placeholder="Email"
-                    placeholderTextColor={theme.colors.primary}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
+            <Image
+                source={require('../assets/images/flow.png')}
+                style={{ width: 78, height: 31, marginLeft: 16 }}
+            />
+            <View style={{ padding: 16 }}>
+                <Text style={styles.header}>Hey Superstar! Let’s get started</Text>
+                <Text style={styles.subheader}>Enter your details to get started</Text>
+                <View style={{
+                    width: '100%',
+                    marginTop: 16,
+                }} />
+                <EditText
+                    label="Email"
                     value={email}
                     onChangeText={setEmail}
+                    placeholder="Email"
+                    keyboardType="email-address"
                 />
-            </View>
-            <View style={{ width: '100%', backgroundColor: 'white', borderRadius: 5, padding: 8, marginTop: 24 }}>
-                <Body style={{ color: theme.colors.text, textAlign: 'left', width: '100%', paddingStart: 4 }}>Password</Body>
-                <TextInput
-                    style={[styles.input, { borderColor: '#00000000', color: theme.colors.primary, paddingBottom: 4, paddingStart: 4, paddingTop: 4 }]}
-                    placeholder="Password"
-                    placeholderTextColor={theme.colors.primary}
-                    autoCapitalize="none"
-                    secureTextEntry
+                <View style={{
+                    width: '100%',
+                    marginTop: 16,
+                }} />
+                <EditText
+                    label="Password"
                     value={password}
                     onChangeText={setPassword}
+                    placeholder="Password"
+                    secureTextEntry
                 />
+
+                <TouchableOpacity
+                    style={[
+                        styles.button,
+                        { backgroundColor: theme.colors.primary, marginTop: 16 },
+                        disabled && { opacity: 0.5 },
+                        loading && { opacity: 0.5 }
+                    ]}
+                    onPress={handleLogin}
+                    disabled={loading} >
+                    <Text style={[styles.buttonText]}>
+                        {loading ? "Logging in..." : "Sign In"}
+                    </Text>
+                </TouchableOpacity>
+                {error && (
+                    <Text style={{ color: 'red', marginTop: 10 }}>
+                        {error.message}
+                    </Text>
+                )}
+                <Text style={styles.signupText}>
+                    Don't have any account? <Link href="/signup" style={{ color: "#014E44" }}>Sign Up</Link>
+                </Text>
             </View>
-            <TouchableOpacity
-                style={[
-                    styles.button,
-                    { backgroundColor: theme.colors.primary, marginTop: 24 },
-                    loading && { opacity: 0.7 }
-                ]}
-                onPress={handleLogin}
-                disabled={loading}
-            >
-                <Text style={[styles.buttonText, { color: theme.colors.background }]}>
-                    {loading ? "Logging in..." : "Login"}
-                </Text>
-            </TouchableOpacity>
-            {error && (
-                <Text style={{ color: 'red', marginTop: 10 }}>
-                    {error.message}
-                </Text>
-            )}
-            <Body style={styles.signupText}>
-                Don't have any account? <Link href="/signup" style={{ color: theme.colors.primary }}>Sign Up</Link>
-            </Body>
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: "center",
+        flex: 1
+    },
+    header: {
+        fontSize: 18,
+        fontWeight: "700",
+        fontFamily: "DMSans-Regular",
+        color: "#333333",
+    },
+    subheader: {
+        fontSize: 14,
+        fontWeight: "300",
+        fontFamily: "DMSans-Regular",
+        color: "#333333",
+        opacity: 0.8,
+        marginTop: 4
+    },
+    toolbar: {
+        backgroundColor: "#fff",
         alignItems: "center",
-        padding: 20,
+        flexDirection: "row",
+        width: "100%",
+        marginBottom: 24,
     },
     logoContainer: {
         height: 72,
@@ -133,10 +169,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     buttonText: {
-        fontSize: 16,
-        fontWeight: 'bold',
+        fontSize: 14,
+        fontWeight: "600",
+        fontFamily: "DMSans-Regular",
+        color: "#fff",
     },
     signupText: {
         marginTop: 20,
+        color: "#8E8E93",
+        fontSize: 14,
+        fontWeight: "700",
+        fontFamily: "DMSans-Regular",
     },
 });
