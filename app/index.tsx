@@ -4,12 +4,13 @@ import { ThemeToggle } from "./components/ThemeToggle";
 import { H2, Typography } from "./components/Typography";
 import { NavLink } from "./components/NavLink";
 import Login from "./login";
+import OnboardingScreen from "./onboarding";
 
 export default function Index() {
   const { theme } = useTheme();
 
   return (
-    <Login />
+    <OnboardingScreen />
   );
 }
 

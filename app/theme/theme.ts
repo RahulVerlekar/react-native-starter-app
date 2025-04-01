@@ -1,5 +1,15 @@
 import { ColorSchemeName } from 'react-native';
 
+const DARK_GRAY = "#333333";
+const MINT_CREAM = "#EBFEF8";
+const DEEP_TEAL = "#014E44";
+const NEON_GREEN = "#28EBA7";
+const SOFT_BLUE = "#9094FF";
+const LIME_YELLOW = "#D0FF73";
+const PALE_LIME = "#E7FFB9";
+const PURE_WHITE = "#FFFFFF";
+
+
 export interface ThemeColors {
   primary: string;
   secondary: string;
@@ -89,9 +99,9 @@ const spacing = {
 };
 
 const lightColors: ThemeColors = {
-  primary: '#5D5E5F',
-  secondary: '#605E5E',
-  background: '#FAFAFA', // Slightly brighter for better contrast
+  primary: DEEP_TEAL,
+  secondary: DARK_GRAY,
+  background: PALE_LIME, 
   card: '#F5F5F5', // Lighter for better separation
   text: '#121212', // Darker text for better readability
   border: '#747878', // outline

@@ -20,6 +20,7 @@ function RootLayoutNav() {
       <Stack.Screen name="signup" options={{ title: 'Sign Up' }} />
       <Stack.Screen name="typography" options={{ title: 'Typography Guide' }} />
       <Stack.Screen name="components" options={{ title: 'UI Components' }} />
+      <Stack.Screen name="onboarding" options={{ title: 'Onboarding' }} />
     </Stack>
   );
 }
