@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Alert, Animated, Pressable, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Alert, Animated, Pressable, TouchableOpacity, Text } from "react-native";
 import { useTheme } from "./theme/ThemeContext";
 import { H1, H2, Body } from "./components/Typography";
 import ThreeLineText from "./components/ThreeLineText";
@@ -9,18 +9,34 @@ import { SessionModel } from './domain/models/session.model';
 import { useRouter } from "expo-router";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { clearAuthToken } from './network/AuthStorage';
+import TwoLineText from './components/TwoLineText';
 
 export default function HomePage() {
     const { theme } = useTheme();
     const router = useRouter();
-    const today = new Date().toLocaleDateString();
-    const greeting = "Hello, Good Evening";
+    const today = new Date().toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    });
     const [scrollY, setScrollY] = useState(new Animated.Value(0));
 
     const { data: recentEntries, loading, error, execute: fetchEntries } = useApi<SessionModel[]>(
         (client) => client.getUserSessions(),
         { immediate: true }
     );
+
+    const getDayTimeGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) {
+            return "Good Morning";
+        } else if (hour < 18) {
+            return "Good Afternoon";
+        } else {
+            return "Good Evening";
+        }
+    }
+    const greeting = "Hello, " + getDayTimeGreeting() + "!";
 
     useEffect(() => {
         fetchEntries().catch(console.error);
@@ -37,27 +53,40 @@ export default function HomePage() {
         router.push("/add-entry");
     };
 
+    function renderItem(item: SessionModel ) {
+        return (
+            <Pressable onPress={() => handleEntryClick(item)}>
+                <View style={[styles.section]}>
+                    <Text>{item.summaryTitle}</Text>
+                </View>
+            </Pressable>
+        );
+    }
+
     return (
         <SafeAreaView
             style={{
                 flex: 1,
-                backgroundColor: theme.colors.background,
                 padding: theme.spacing.md,
+                backgroundColor: "#fff",
             }}
         >
             <View style={styles.headerContainer}>
-                <H1 style={styles.greeting}>{greeting}</H1>
+                <Text style={styles.dateText}>{today}</Text>
                 <TouchableOpacity onPress={() => Alert.alert("Logout", "Are you sure you want to logout?", [
                     { text: "Cancel", style: "cancel" },
-                    { text: "Logout", onPress: () => {
-                        clearAuthToken();
-                        router.replace("/");
-                    } }
+                    {
+                        text: "Logout", onPress: () => {
+                            clearAuthToken();
+                            router.replace("/");
+                        }
+                    }
                 ])}>
                     <MaterialIcons name="logout" size={24} color='red' />
                 </TouchableOpacity>
             </View>
-            <H2 style={[styles.subtitle, { marginBottom: 4 }]}>Your journal entries</H2>
+            <Text style={styles.greeting}>{greeting}</Text>
+            <Text style={[styles.subtitle]}>Your Journey</Text>
             {loading ? (
                 <Body>Loading...</Body>
             ) : error ? (
@@ -66,20 +95,14 @@ export default function HomePage() {
                 <Animated.FlatList
                     data={recentEntries}
                     renderItem={({ item }) => (
-                        <ThreeLineText
-                            caption={item.frameworkTitle}
-                            title={item.summaryTitle}
-                            body={item.summary}
-                            onClick={handleEntryClick}
-                            param={item}
-                        />
+                        renderItem(item)
                     )}
                     keyExtractor={item => item.id}
                 />
             )}
 
             <Animated.View style={[styles.fabContainer, { transform: [{ translateY: scrollY }] }]}>
-                <Pressable style={[styles.fab, { backgroundColor: theme.colors.onBackground }]} onPress={handleNewEntry}>
+                <Pressable style={[styles.fab, { backgroundColor: "#014E44" }]} onPress={handleNewEntry}>
                     <Ionicons name="add" size={24} color="white" />
                     <Body style={styles.fabText}>New Entry</Body>
                 </Pressable>
@@ -94,10 +117,29 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     subtitle: {
-        marginTop: 8,
+        marginTop: 20,
+        color: "#333333",
+        fontSize: 18,
+        fontWeight: "600",
+        fontFamily: "DMSans-Regular",
+    },
+    itemContainer: {
+        padding: 16,
+        borderRadius: 8,
+        backgroundColor: "#fff",
+        marginVertical: 8,
+        marginHorizontal: 16,
     },
     section: {
-        marginBottom: 24,
+        marginBottom: 4,
+        padding: 16,
+        borderRadius: 20,
+        backgroundColor: "#EBFEF8",
+        marginVertical: 8,
+        color: "#333333",
+        fontSize: 14,
+        fontWeight: "500",
+        fontFamily: "DMSans-Regular",
     },
     links: {
         marginTop: 16,
@@ -115,7 +157,7 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     fabContainer: {
-        width: 200,
+        width: 160,
         position: 'absolute',
         alignSelf: 'center',
         bottom: 64,
@@ -127,7 +169,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#6200ee',
         paddingHorizontal: 16,
-        paddingVertical: 8,
+        paddingVertical: 16,
         borderRadius: 28,
         elevation: 4,
     },
@@ -136,9 +178,19 @@ const styles = StyleSheet.create({
         marginLeft: 8,
         fontSize: 16,
     },
-    greeting: {
+    dateText: {
         marginTop: 16,
         marginBottom: 16,
+        color: "#666666",
+        fontSize: 12,
+        fontWeight: "600",
+        fontFamily: "DMSans-Regular",
+    },
+    greeting: {
+        color: "#1A3234",
+        fontSize: 24,
+        fontWeight: "600",
+        fontFamily: "DMSans-Regular",
     },
     headerContainer: {
         flexDirection: 'row',

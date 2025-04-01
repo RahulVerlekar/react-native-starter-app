@@ -1,11 +1,6 @@
-import { View, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { useTheme } from "./theme/ThemeContext";
-import { ThemeToggle } from "./components/ThemeToggle";
-import { H2, Typography } from "./components/Typography";
-import { NavLink } from "./components/NavLink";
 import Login from "./login";
-import OnboardingScreen from "./onboarding";
-import SignUp from "./signup";
 
 export default function Index() {
   const { theme } = useTheme();
