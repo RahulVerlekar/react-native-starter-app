@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: '600',
         fontFamily: 'DMSans-Regular',
         color: '#333333',
         flex: 1
