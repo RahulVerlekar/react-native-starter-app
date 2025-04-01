@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         color: "#8E8E93",
         fontSize: 14,
-        fontWeight: "700",
+        fontWeight: "500",
         fontFamily: "DMSans-Regular",
     },
 });

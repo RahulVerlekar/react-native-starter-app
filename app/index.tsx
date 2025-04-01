@@ -5,12 +5,13 @@ import { H2, Typography } from "./components/Typography";
 import { NavLink } from "./components/NavLink";
 import Login from "./login";
 import OnboardingScreen from "./onboarding";
+import SignUp from "./signup";
 
 export default function Index() {
   const { theme } = useTheme();
 
   return (
-    <OnboardingScreen />
+    <Login />
   );
 }
 
