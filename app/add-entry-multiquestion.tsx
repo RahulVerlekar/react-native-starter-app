@@ -1,5 +1,5 @@
 import { Link, router } from "expo-router";
-import { Text, View, Button, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, Pressable } from "react-native";
+import { Text, View, Button, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, Pressable, FlatList } from "react-native";
 import ToolbarHeader from "./components/ToolbarHeader";
 import { Caption, H1, H2 } from "./components/Typography";
 import { useTheme } from "./theme/ThemeContext";
@@ -11,13 +11,22 @@ import { SessionModel } from "./domain/models/session.model";
 import { useVoiceRecorder } from './hooks/useVoiceRecorder';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useVoicePlayback } from './hooks/useVoicePlayback';
+import Toolbar from "./components/NewToolbar";
+import ChatEntryItem from "./components/ChatEntryItem";
 
-export default function AddEntry() {
+export default function AddEntryMultiQuestion() {
 
     const theme = useTheme()
+    const [entries, setEntries] = useState<JournalEntryModel[]>([]);
     const [selectedEntry, setSelectedEntry] = useState<JournalEntryModel | null>(null);
     const [answer, setAnswer] = useState<string>("");
     const [handsfreeModeActive, setHandsfreeModeActive] = useState(false);
+
+    const today = new Date().toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+    });
 
     const { data: created, error, loading, execute: fetchSessionEntries } = useApi<{ session: SessionModel, entries: JournalEntryModel[] }>(
         (client) => client.getSessionDetails("e397b03c-17e4-4a04-a872-c2f185c8db63"),
@@ -52,7 +61,8 @@ export default function AddEntry() {
     useEffect(() => {
         const fetchEntries = async () => {
             const data = await fetchSessionEntries();
-            const entry = data.entries[0];
+            setEntries(data.entries);
+            const entry = data.entries[data.entries.length - 1];
             setSelectedEntry(entry);
             if (entry.question?.question) {
                 await playVoice(entry.question.question);
@@ -65,6 +75,7 @@ export default function AddEntry() {
         if (selectedEntry && created?.session) {
             await addAnswer(created?.session.id, selectedEntry.id, answer);
             const data = await getNextQuestion(created?.session.id);
+            setEntries(data.entries);
             setSelectedEntry(data.entries[data.entries.length - 1]);
             setAnswer("");
 
@@ -107,39 +118,17 @@ export default function AddEntry() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.container}>
-                <View style={styles.headerContainer}>
-                    <H2 style={styles.title}>Journal Details</H2>
-                    <View style={styles.toolbarButtons}>
-                        <TouchableOpacity
-                            onPress={handleVoiceRecording}
-                            style={[
-                                styles.micButton,
-                                isRecording && styles.recording,
-                                handsfreeModeActive && styles.handsfreeMode
-                            ]}
-                        >
-                            <Ionicons
-                                name={isRecording ? "stop-circle" : "mic"}
-                                size={24}
-                                color={theme.theme.dark ? "#FFFFFF" : "#000000"}
-                            />
-                        </TouchableOpacity>
-                        {/* <TouchableOpacity
-                            onPress={isPlaying ? stopPlaying : () => playVoice(selectedEntry?.question?.question || '')}
-                            style={[styles.micButton, isPlaying && styles.playing]}
-                        >
-                            <Ionicons
-                                name={isPlaying ? "stop" : "play"}
-                                size={24}
-                                color={theme.theme.dark ? "#FFFFFF" : "#000000"}
-                            />
-                        </TouchableOpacity> */}
-                        <TouchableOpacity onPress={handleBackPress}>
-                            <MaterialIcons name="close" size={24} color='black' />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+            <View style={styles.toolbar}>
+                <Toolbar
+                    title="Entry Details"
+                    hasBack={true}
+                    onBackPress={() => {
+                        router.dismiss()
+                    }}
+                />
+            </View>
+            <Text style={styles.dateText}>{today}</Text>
+            <View style={{ flex: 1 }}>
                 <View style={styles.contentContainer}>
                     <View style={styles.qnaIndicator}>
                         {recordingError && <Caption style={styles.error}>{recordingError}</Caption>}
@@ -148,7 +137,28 @@ export default function AddEntry() {
                         {isPlaying && <Caption>Playing question...</Caption>}
                     </View>
                     <View style={styles.qnaContainer}>
-                        <View style={styles.questionContainer}>
+                        <FlatList
+                            style={{ flex: 1 }}
+                            data={entries}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => (
+                                <>
+                                    <View style={styles.container}>
+                                        <ChatEntryItem
+                                            question={item.question?.question ?? ""}
+                                            hint={item.question?.hint ?? ""}
+                                            answer={selectedEntry?.id != item.id ? item.entry : answer}
+                                            disableInput={selectedEntry?.id != item.id}
+                                            onChangeText={() => {
+                                                if(selectedEntry?.id == item.id) {
+                                                    setAnswer(item.entry)
+                                                }
+                                            }} />
+                                    </View>
+                                </>
+                            )}
+                        />
+                        {/* <View style={styles.questionContainer}>
                             <H2>{selectedEntry?.question?.question ?? ""}</H2>
                         </View>
                         <View style={styles.answerContainer}>
@@ -161,16 +171,41 @@ export default function AddEntry() {
                                     multiline
                                 />
                             </View>
-                        </View>
+                        </View> */}
                     </View>
-                    <View style={styles.bottomContainer}>
-                        <View style={{alignSelf: 'flex-end'}}>
-                            <Button
-                                title="Next Question"
-                                onPress={handleNextQuestion}
-                                color={theme.theme.dark ? "#FFFFFF" : "#000000"}
-                            />
-                        </View>
+                </View>
+                <View style={styles.bottomContainer}>
+                    {(!isRecording && !isPlaying) && (
+                        <TouchableOpacity onPress={handleVoiceRecording} style={{ height: 48, width: 48, alignItems: 'center', justifyContent: 'center' }}>
+                            <Ionicons name="mic-circle-outline" size={48} color="#014E44" />
+                        </TouchableOpacity>
+                    )}
+                    {isPlaying && (
+                        <TouchableOpacity onPress={stopPlaying} style={{ height: 48, width: 48, alignItems: 'center', justifyContent: 'center' }}>
+                            <Ionicons name="stop-circle-outline" size={48} color="#014E44" />
+                        </TouchableOpacity>
+                    )}
+                    {isRecording && (
+                        <TouchableOpacity onPress={handleVoiceRecording} style={{ height: 48, width: 48, alignItems: 'center', justifyContent: 'center' }}>
+                            <Ionicons name="stop-circle-outline" size={48} color="#014E44" />
+                        </TouchableOpacity>
+                    )}
+                    <View style={{ flex: 1 }} />
+                    <View style={{ flexDirection: "row", alignContent: "center", justifyContent: "center" }}>
+                        <TouchableOpacity
+                            onPress={handleNextQuestion}
+                            style={styles.nextButton}>
+                            <Text style={styles.nextButtonText}>
+                                Next Question
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={handleBackPress}
+                            style={styles.endButton}>
+                            <Text style={styles.endButtonText}>
+                                End Session
+                            </Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
@@ -195,9 +230,13 @@ const styles = StyleSheet.create({
         flexGrow: 1,
     },
     bottomContainer: {
+        height: 70,
+        paddingStart: 16,
+        paddingEnd: 16,
         flexDirection: "row",
-        justifyContent: "flex-end",
-        alignItems: "flex-end",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        borderWidth: 1
     },
     questionContainer: {
 
@@ -251,4 +290,44 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    nextButton: {
+        backgroundColor: "#014E44",
+        borderRadius: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        marginRight: 10,
+        alignItems: "center",
+    },
+    endButton: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderWidth: 1,
+        borderColor: "#014E44",
+    },
+    nextButtonText: {
+        fontFamily: "DM Sans",
+        fontWeight: "700",
+        fontSize: 12,
+        letterSpacing: 0,
+        color: "#fff",
+        textAlign: "center",
+    },
+    endButtonText: {
+        fontFamily: "DM Sans",
+        fontWeight: "700",
+        fontSize: 12,
+        letterSpacing: 0,
+        color: "#014E44",
+        textAlign: "center"
+    },
+    dateText: {
+        marginTop: 16,
+        marginStart: 16,
+        color: "#666666",
+        fontSize: 12,
+        fontWeight: "600",
+        fontFamily: "DMSans-Regular",
+    }
 });

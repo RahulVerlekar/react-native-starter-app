@@ -50,7 +50,7 @@ export default function HomePage() {
     };
 
     const handleNewEntry = () => {
-        router.push("/add-entry");
+        router.push("/add-entry-multiquestion");
     };
 
     function renderItem(item: SessionModel ) {

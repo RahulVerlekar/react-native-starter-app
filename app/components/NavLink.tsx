@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 import { useTheme } from "../theme/ThemeContext";
 
 interface NavLinkProps {
-  to: '/login' | '/homepage' | '/add-entry' | '/entry-details' | '/signup' | '/typography' | '/components';
+  to: '/login' | '/homepage' | '/add-entry' | '/entry-details' | '/signup' | '/typography' | '/components'| '/onboarding' | '/add-entry-multiquestion';
   children: React.ReactNode;
 }
 
