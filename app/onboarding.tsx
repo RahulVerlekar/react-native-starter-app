@@ -1,9 +1,10 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Image, StyleSheet, Button, Dimensions, TouchableOpacity } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getAuthToken } from './network/AuthStorage';
 
 const { width } = Dimensions.get('window');
 
@@ -28,13 +29,13 @@ const slides = [
 const OnboardingScreen = () => {
     const router = useRouter();
     const [currentSlide, setCurrentSlide] = useState(0);
-    const pagerRef = useRef<PagerView>(null); 
+    const pagerRef = useRef<PagerView>(null);
 
     const handleNext = () => {
         if (currentSlide < slides.length - 1) {
             const nextSlide = currentSlide + 1;
             setCurrentSlide(nextSlide);
-            pagerRef.current?.setPage(nextSlide); 
+            pagerRef.current?.setPage(nextSlide);
         }
     };
 
@@ -45,6 +46,17 @@ const OnboardingScreen = () => {
             pagerRef.current?.setPage(prevSlide);
         }
     };
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const token = await getAuthToken();
+            if (token) {
+                router.replace("/homepage");
+            }
+        };
+        checkAuth();
+    }, []);
+    
 
     return (
         <SafeAreaView style={styles.container}>

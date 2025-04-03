@@ -20,7 +20,7 @@ export default function AddEntry() {
     const [handsfreeModeActive, setHandsfreeModeActive] = useState(false);
 
     const { data: created, error, loading, execute: fetchSessionEntries } = useApi<{ session: SessionModel, entries: JournalEntryModel[] }>(
-        (client) => client.getSessionDetails("e397b03c-17e4-4a04-a872-c2f185c8db63"),
+        (client) => client.startNewSession("Journaling Session"),
         { immediate: false }
     );
 
@@ -98,7 +98,12 @@ export default function AddEntry() {
                 },
                 {
                     text: "Yes, End Session",
-                    onPress: () => router.back(),
+                    onPress: () => {
+                        router.replace({
+                            pathname: "/entry-details",
+                            params: { refreshData: "true" },
+                        });
+                    },
                     style: "destructive"
                 }
             ]

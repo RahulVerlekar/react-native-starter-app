@@ -34,19 +34,21 @@ export class FlowApiClient extends BaseNetworkRepo {
 
   // Session endpoints
   async getUserSessions(): Promise<SessionModel[]> {
-    return this.get<SessionModel[]>('/sessions');
+    return this.get<SessionModel[]>('/sessions').then((sessions) => {
+      return sessions.reverse();
+    });
   }
 
-  async startNewSession(framework: string): Promise<{session: SessionModel, entries: JournalEntryModel[]}> {
-    return this.get<{session: SessionModel, entries: JournalEntryModel[]}>('/sessions/start?framework=' + framework);
+  async startNewSession(framework: string): Promise<{ session: SessionModel, entries: JournalEntryModel[] }> {
+    return this.get<{ session: SessionModel, entries: JournalEntryModel[] }>('/sessions/start?framework=' + framework);
   }
 
   async endSession(sessionId: string): Promise<SessionModel> {
     return this.get<SessionModel>(`/sessions/${sessionId}/end`);
   }
 
-  async getNextQuestion(sessionId: string): Promise<{session: SessionModel, entries: JournalEntryModel[]}> {
-    return this.get<{session: SessionModel, entries: JournalEntryModel[]}>(`/sessions/${sessionId}/next-question`);
+  async getNextQuestion(sessionId: string): Promise<{ session: SessionModel, entries: JournalEntryModel[] }> {
+    return this.get<{ session: SessionModel, entries: JournalEntryModel[] }>(`/sessions/${sessionId}/next-question`);
   }
 
   async addAnswer(sessionId: string, entryId: string, answer: string): Promise<JournalEntryModel> {
@@ -57,11 +59,11 @@ export class FlowApiClient extends BaseNetworkRepo {
     return this.get<JournalEntryModel[]>(`/sessions/${sessionId}/entries`);
   }
 
-  async getSessionDetails(sessionId: string): Promise<{session: SessionModel, entries: JournalEntryModel[]}> {
-    return this.get<{session: SessionModel, entries: JournalEntryModel[]}>(`/sessions/${sessionId}/details`);
+  async getSessionDetails(sessionId: string): Promise<{ session: SessionModel, entries: JournalEntryModel[] }> {
+    return this.get<{ session: SessionModel, entries: JournalEntryModel[] }>(`/sessions/${sessionId}/details`);
   }
 
-  async getLastEntries(): Promise<Array<{ sessionId: string, lastEntry: JournalEntryModel }>>{
+  async getLastEntries(): Promise<Array<{ sessionId: string, lastEntry: JournalEntryModel }>> {
     return this.get<Array<{ sessionId: string, lastEntry: JournalEntryModel }>>('/sessions/last-entries');
   }
 

@@ -29,7 +29,7 @@ export default function AddEntryMultiQuestion() {
     });
 
     const { data: created, error, loading, execute: fetchSessionEntries } = useApi<{ session: SessionModel, entries: JournalEntryModel[] }>(
-        (client) => client.getSessionDetails("e397b03c-17e4-4a04-a872-c2f185c8db63"),
+        (client) => client.startNewSession("Journaling Session"),
         { immediate: false }
     );
 
@@ -150,7 +150,7 @@ export default function AddEntryMultiQuestion() {
                                             answer={selectedEntry?.id != item.id ? item.entry : answer}
                                             disableInput={selectedEntry?.id != item.id}
                                             onChangeText={() => {
-                                                if(selectedEntry?.id == item.id) {
+                                                if (selectedEntry?.id == item.id) {
                                                     setAnswer(item.entry)
                                                 }
                                             }} />

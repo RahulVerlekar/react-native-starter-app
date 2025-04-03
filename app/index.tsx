@@ -1,12 +1,13 @@
 import { StyleSheet } from "react-native";
 import { useTheme } from "./theme/ThemeContext";
 import Login from "./login";
+import OnboardingScreen from "./onboarding";
 
 export default function Index() {
   const { theme } = useTheme();
 
   return (
-    <Login />
+    <OnboardingScreen />
   );
 }
 

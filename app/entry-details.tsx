@@ -1,14 +1,11 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Button, StyleSheet, Text, View, TouchableOpacity, FlatList, ScrollView, Pressable } from "react-native";
-import ToolbarHeader from "./components/ToolbarHeader";
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
-import { Body, Caption, H1, H2, H3 } from "./components/Typography";
-import TwoLineText from "./components/TwoLineText";
+import { Body, Caption } from "./components/Typography";
 import { SessionModel } from "./domain/models/session.model";
 import { useApi } from "./network/useApi";
 import { JournalEntryModel } from "./domain/models/journal-entry.model";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
 import Toolbar from "./components/NewToolbar";
 import { sentimentScore } from "./utils/emotionClassifier";
 

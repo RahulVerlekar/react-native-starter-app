@@ -6,7 +6,7 @@ import ThreeLineText from "./components/ThreeLineText";
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useApi } from "./network/useApi";
 import { SessionModel } from './domain/models/session.model';
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { clearAuthToken } from './network/AuthStorage';
 import TwoLineText from './components/TwoLineText';
@@ -19,6 +19,9 @@ export default function HomePage() {
         month: 'long',
         year: 'numeric'
     });
+    const { refreshData } = useLocalSearchParams<{
+        refreshData?: string
+    }>();
     const [scrollY, setScrollY] = useState(new Animated.Value(0));
 
     const { data: recentEntries, loading, error, execute: fetchEntries } = useApi<SessionModel[]>(
@@ -40,7 +43,7 @@ export default function HomePage() {
 
     useEffect(() => {
         fetchEntries().catch(console.error);
-    }, []);
+    }, [refreshData]);
 
     const handleEntryClick = (param?: SessionModel) => {
         router.push({
@@ -53,7 +56,7 @@ export default function HomePage() {
         router.push("/add-entry-multiquestion");
     };
 
-    function renderItem(item: SessionModel ) {
+    function renderItem(item: SessionModel) {
         return (
             <Pressable onPress={() => handleEntryClick(item)}>
                 <View style={[styles.section]}>
